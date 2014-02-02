@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap('INT') { exit 1 }
+
+require 'carta'
+require 'carta/cli'
+
+Carta::CLI::Base.start(ARGV)

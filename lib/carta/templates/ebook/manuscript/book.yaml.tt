@@ -1,0 +1,5 @@
+<%- keys = ''
+meta.map do |k, v|
+  keys << "#{k}: #{v}\n"
+end -%>
+<%= keys %>
