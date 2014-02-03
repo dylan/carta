@@ -1,6 +1,6 @@
 # Carta
 
-TODO: Write a gem description
+Carta is a command line tool to aid in the ebook creation workflow. Initially it will support the HTML and EPUB formats.
 
 ## Installation
 
