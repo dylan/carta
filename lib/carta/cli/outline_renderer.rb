@@ -1,4 +1,3 @@
-require 'redcarpet'
 # Custom Renderer for Redcarpet
 class OutlineRenderer < Redcarpet::Render::HTML
   attr_accessor :outline
