@@ -14,10 +14,11 @@ class OutlineRenderer < Redcarpet::Render::HTML
     value = [header_level, text, text_slug]
     if header_level <= 2
       (prior_level < header_level) ? outline.last << value : outline << value
-      render_line(header_level, text, text_slug, true)
+      with_id = true
     elsif header_level > 2
-      render_line(header_level, text, text_slug)
+      with_id = false
     end
+    return render_line(header_level, text, text_slug, with_id)
   end
 
   def render_line(header_level, text, text_slug, with_id = false)

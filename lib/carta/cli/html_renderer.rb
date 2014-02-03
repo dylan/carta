@@ -12,7 +12,7 @@ module Carta
       @markdown = ''
       @toc_html = ''
       @manuscript_html = ''
-      @outline = []
+      @outline = nil
       load_markdown(path)
     end
 
@@ -28,7 +28,7 @@ module Carta
       renderer = OutlineRenderer.new
       r = Redcarpet::Markdown.new(renderer)
       manuscript_html << r.render(markdown)
-      outline << renderer.outline
+      @outline = renderer.outline
       render_outline
     end
 
@@ -36,7 +36,6 @@ module Carta
       final_class = "class='#{html_class}'"
       outline.each_with_index do |data, i|
         level, text, link, *children = data
-        binding.pry
         toc_html << "<ol #{final_class}>" if i == 0
         toc_html << "\n  <li><a href='##{link}'>#{text}</a>"
 
