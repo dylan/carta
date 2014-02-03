@@ -6,7 +6,7 @@ module Carta::CLI
     def initialize(thor, meta)
       @thor = thor
       @meta = meta
-      @book_name = (meta[:name].is_a? String) ? meta[:name] : meta[:name].join(' ')
+      @book_name = (meta[:title].is_a? String) ? meta[:title] : meta[:title].join(' ')
     end
 
     def run

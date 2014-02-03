@@ -1,4 +1,5 @@
 require 'pry'
+require 'uuid'
 require 'carta/cli/book'
 require 'carta/cli/chapter'
 
@@ -18,17 +19,24 @@ module Carta::CLI
       name = name.empty? ? '' : name.join(' ')
 
       say("\nThis utility will walk you through creating an ebook project.")
-      say("\nPress ^C at any time to quit.\n")
+      say("\nPress ^C at any time to quit.")
 
       require 'carta/cli/book'
-      prompt_name   = name.empty? ? '' : "(#{name})"
-      ask_title = ask("Title:#{prompt_name}")
+
+      default_name   = name.empty? ? '' : "(#{name})"
+
+      ask_title    = ask "Title:#{default_name}"
+      ask_lang     = ask 'Language: (en-US)'
+      ask_uuid     = ask 'uuid:'
+      ask_license  = ask 'License: (MIT)'
+
       @meta = {
-        name:     ask_title.empty? ? name : ask_title,
+        title:    ask_title.empty? ? name : ask_title,
         subtitle: ask('Subtitle: (blank)'),
-        language: ask('Language: (en)'),
+        language: ask_lang.empty? ? 'en-US' : ask_lang,
         authors:  ask('Authors: (blank)'),
-        uid:      ask('uuid: (blank)')
+        uid:      ask_uuid.empty? ? UUID.new.generate : ask_uuid,
+        license:  ask_license.empty? ? 'MIT' : ask_license
       }
       Carta::CLI::Book.new(self, meta).run
     end
@@ -36,9 +44,7 @@ module Carta::CLI
     desc 'chapter [number] [name]',
          'Create a chapter with the given name or number.'
     def chapter(number, *name)
-      unless /\p{N}/.match number
-        number, name = '00', [number].concat(name)
-      end
+      number, name = '00', [number].concat(name) unless /\p{N}/.match number
       require 'carta/cli/chapter'
       Carta::CLI::Chapter.new(self, number, name).run
     end
