@@ -18,7 +18,7 @@ class OutlineRenderer < Redcarpet::Render::HTML
     elsif header_level > 2
       with_id = false
     end
-    return render_line(header_level, text, text_slug, with_id)
+    render_line(header_level, text, text_slug, with_id)
   end
 
   def render_line(header_level, text, text_slug, with_id = false)
