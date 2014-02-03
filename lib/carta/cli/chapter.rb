@@ -34,7 +34,7 @@ module Carta::CLI
           path = "#{target_dir[0]}/#{@handy_subchapter_name}.md"
         end
         thor.create_file path do
-          level = @chapters[2].nil? ? '##' : '#' * (@chapters[2].to_i + 1)
+          level = @chapters[2].nil? ? '#' : '#' * (@chapters[2].to_i + 1)
           contents = "#{level} #{chapter_name}"
           contents << "\nLorem ipsum dolor sit amet, consectetur adipisicing elit."
         end
