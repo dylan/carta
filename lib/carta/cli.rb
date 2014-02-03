@@ -1,3 +1,4 @@
+require 'pry'
 require 'carta/cli/book'
 require 'carta/cli/chapter'
 
@@ -35,7 +36,9 @@ module Carta::CLI
     desc 'chapter [number] [name]',
          'Create a chapter with the given name or number.'
     def chapter(number, *name)
-      number = '00' if number.kind_of?(String) && name
+      unless /\p{N}/.match number
+        number, name = '00', [number].concat(name)
+      end
       require 'carta/cli/chapter'
       Carta::CLI::Chapter.new(self, number, name).run
     end

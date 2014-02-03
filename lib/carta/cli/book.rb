@@ -13,7 +13,7 @@ module Carta::CLI
       require 'carta/cli/chapter'
       thor.directory 'ebook', book_name
       thor.inside book_name do
-        Carta::CLI::Chapter.new(thor, 1, "My First #{book_name} Chapter").run
+        Carta::CLI::Chapter.new(thor, 0, "My First #{book_name} Chapter").run
       end
     end
   end

@@ -1,5 +1,4 @@
 require 'carta/cli/outline_renderer'
-require 'pry'
 
 module Carta
   class CLI::HTMLRenderer
