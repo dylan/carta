@@ -1,4 +1,3 @@
-require 'pry'
 require 'uuid'
 require 'carta/cli/book'
 require 'carta/cli/chapter'
@@ -7,7 +6,18 @@ module Carta::CLI
   # The class from which it all begins
   class Base < Thor
     include Thor::Actions
-    attr_reader :meta
+    attr_reader :meta,
+                :BUILD_PATH,
+                :LAYOUT_PATH,
+                :MANU_PATH,
+                :ASSET_PATH
+
+    # def initialize(*args)
+    #   @BUILD_PATH  = 'build'
+    #   @LAYOUT_PATH = 'layouts'
+    #   @MANU_PATH   = 'manuscript'
+    #   @ASSET_PATH  = 'assets'
+    # end
 
     def self.source_root
       File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
@@ -26,17 +36,17 @@ module Carta::CLI
       default_name   = name.empty? ? '' : "(#{name})"
 
       ask_title    = ask "Title:#{default_name}"
+      ask_license  = ask 'License: (MIT)'
       ask_lang     = ask 'Language: (en-US)'
       ask_uuid     = ask 'uuid:'
-      ask_license  = ask 'License: (MIT)'
 
       @meta = {
         title:    ask_title.empty? ? name : ask_title,
         subtitle: ask('Subtitle: (blank)'),
-        language: ask_lang.empty? ? 'en-US' : ask_lang,
         authors:  ask('Authors: (blank)'),
-        uid:      ask_uuid.empty? ? UUID.new.generate : ask_uuid,
-        license:  ask_license.empty? ? 'MIT' : ask_license
+        language: ask_lang.empty? ? 'en-US' : ask_lang,
+        license:  ask_license.empty? ? 'MIT' : ask_license,
+        uid:      ask_uuid.empty? ? UUID.new.generate : ask_uuid
       }
       Carta::CLI::Book.new(self, meta).run
     end

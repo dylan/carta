@@ -1,5 +1,7 @@
 require 'yaml'
 require 'thor/rake_compat'
+require 'pry'
+require 'mime-types'
 require 'carta/cli/html_renderer'
 
 module Carta
@@ -9,17 +11,17 @@ module Carta
                 :project_dir
 
     def initialize(thor)
-      @project_dir = Dir.pwd
-      @thor = thor
-      @book = YAML.load_file("#{project_dir}/manuscript/book.yaml")
-    end
-
-    def run
       if Dir.exists?('manuscript')
-        generate_html
+        @project_dir = Dir.pwd
+        @thor = thor
+        @book = YAML.load_file("#{project_dir}/manuscript/book.yaml")
       else
         thor.error 'No book found to compile!'
       end
+    end
+
+    def run
+      generate_html if Dir.exists?('manuscript')
     end
 
     # Generates our HTML from markdown files and creates an outline
@@ -29,7 +31,7 @@ module Carta
       book['outline']   = html_renderer.outline
       book['toc_html']  = html_renderer.toc_html
 
-      render_layouts
+      generate_manifest
     end
 
     # Runs through our ERBs
@@ -43,39 +45,40 @@ module Carta
 
         FileUtils.mkpath(path) unless File.exists? path
 
-        template = ERB.new(File.read(layout))
+        template = ERB.new(File.read(layout),nil,'-')
         File.open(filename, 'w+') do |handle|
           handle.write template.result(binding)
         end
       end
-      generate_manifest
+
     end
 
     def generate_manifest
       layout_dir = "#{project_dir}/layouts"
 
       files   = FileList.new("#{layout_dir}/epub/EPUB/*.erb")
-                      .exclude('**/*.opf*')
-      figures = FileList.new('manuscript/figures/**/*.{jpg,png,svg,mp4,gif}')
-      fonts  = FileList.new('assets/fonts/**/*.{otf,ttf}')
-      css  = FileList.new('assets/css/**/*.css')
+                        .pathmap("%{^#{layout_dir}/epub/EPUB,}X")
+                        .add('manuscript/figures/**/*.{tif,jpeg,jpg,png,svg,mp4,gif}',
+                             'assets/fonts/**/*.{otf,ttf}',
+                             'assets/css/**/*.css',
+                             'assets/*.{tif,jpeg,jpg,png,svg,gif}',
+                             'manuscript/cover.{jpg,png,svg,gif')
+                        .pathmap('%{^assets,}p')
+                        .pathmap('%{^manuscript/figures,figures}p')
+                        .exclude('**/*.opf*')
+                        .exclude('**/*.ncx*')
 
+      book['manifest'] = []
       files.each do |file|
-        filename = file.pathmap("%{^#{layout_dir},build}X")
-        puts "file: #{filename}"
+        # filename = file.pathmap("%{^#{layout_dir},build}p")
+        media_type = MIME::Types.type_for(file).first.content_type
+        if file.include? 'cover'
+          book['cover'] = { filename: file, media_type: media_type }
+        else
+          book['manifest'] << { filename: file, media_type: media_type }
+        end
       end
-      figures.each do |file|
-        filename = file.pathmap("%{^manuscript/figures,build/epub/EPUB/figures}p")
-        puts "figure: #{filename}"
-      end
-      fonts.each do |file|
-        filename = file.pathmap("%{^assets/fonts,build/epub/EPUB/}p")
-        puts "font: #{filename}"
-      end
-      css.each do |file|
-        filename = file.pathmap("%{^assets/css,build/epub/EPUB/}p")
-        puts "css: #{filename}"
-      end
+      render_layouts
     end
   end
 end

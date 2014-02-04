@@ -8,11 +8,23 @@
         <text><%= book['title'] %></text>
     </docTitle>
     <navMap>
-        <navPoint id="ch1">
+    <%- book['outline'].each_with_index do |item, i| -%>
+        <navPoint id="#<%= item[2] %>">
             <navLabel>
-                <text>I. THE BURIAL OF THE DEAD</text>
+                <text><%= i+1 -%>. <%= item[1] %></text>
             </navLabel>
-            <content src="wasteland-content.xhtml#ch1"/>
+            <content src="content.html#<%= item[2] %>"/>
+            <%- if item.length > 3
+                for j in (3..(item.length - 3)) -%>
+            <navPoint id="#<%= item[j][2] %>">
+                <navLabel>
+                    <text><%= "#{i+1}.#{j-2}" %> <%= item[j][1] %></text>
+                </navLabel>
+                <content src="content.html#<%= item[j][2] %>"/>
+            </navPoint>
+            <%- end -%>
+            <%- end -%>
         </navPoint>
+    <%- end -%>
     </navMap>
 </ncx>

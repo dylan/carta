@@ -10,20 +10,15 @@
         <meta name="cover" content="cover"/>
     </metadata>
     <manifest>
-        <%= book['manifest'] %>
-        <item id="t1" href="wasteland-content.xhtml" media-type="application/xhtml+xml" />
-        <item id="nav" href="wasteland-nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
-        <item id="cover" href="wasteland-cover.jpg" media-type="image/jpeg" properties="cover-image" />
-        <item id="css" href="wasteland.css" media-type="text/css" />
-        <item id="css-fonts" href="fonts.css" media-type="text/css" />
-        <item id="css-night" href="wasteland-night.css" media-type="text/css" />
-        <item id="font.OldStandard.regular" href="OldStandard-Regular.otf" media-type="application/vnd.ms-opentype"/>
-        <item id="font.OldStandard.italic" href="OldStandard-Italic.otf" media-type="application/vnd.ms-opentype"/>
-        <item id="font.OldStandard.bold" href="OldStandard-Bold.otf" media-type="application/vnd.ms-opentype"/>
+        <%- book['manifest'].each do |item| -%>
+        <item href="<%= item[:filename].gsub('EPUB/','') %>" media-type="<%= item[:media_type] %>" />
+        <%- end -%>
+        <item id="cover" href="<%= book['cover'][:filename] %>" media-type="<%= book['cover'][:media_type] %>" properties="cover-image" />
+        <item id="toc" properties="nav" href="nav.html" media-type="application/html"/>
         <!-- ncx included for 2.0 reading system compatibility: -->
         <item id="ncx" href="main.ncx" media-type="application/x-dtbncx+xml" />
     </manifest>
-    <spine toc="ncx">
-        <itemref idref="t1" />
+    <spine toc='ncx'>
+        <itemref linear='no' idref="toc" />
     </spine>
 </package>
