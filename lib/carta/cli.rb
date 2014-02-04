@@ -54,7 +54,7 @@ module Carta::CLI
     desc 'chapter [number] [name]',
          'Create a chapter with the given name or number.'
     def chapter(number, *name)
-      number, name = '00', [number].concat(name) unless /\p{N}/.match number
+      number, name = '00', [number].concat(name) unless /\d+/.match number
       require 'carta/cli/chapter'
       Carta::CLI::Chapter.new(self, number, name).run
     end
