@@ -1,9 +1,8 @@
 require 'yaml'
 require 'thor/rake_compat'
-require 'pry'
 require 'mime-types'
 require 'carta/cli/html_renderer'
-
+require 'pry'
 module Carta
   class CLI::Compile
     attr_reader :thor,
