@@ -29,7 +29,12 @@ numbers formatted like `1.1` will create a folder that matches the correct heira
 Will generate a build folder with the compiled files in it.
 
 ## TODO
-* Generate actual EPUB
+* Add partial support
+* Remove html generation from the cli codebase
+* Maybe switch to tilt for templates
+* Improve chapter creation (not intuitive atm)
+* Improve status messages
+* Use thor for more of the template rendering/etc.
 * Integrate SCSS/etc.
 
 ## Contributing
