@@ -29,6 +29,7 @@ numbers formatted like `1.1` will create a folder that matches the correct heira
 Will generate a build folder with the compiled files in it.
 
 ## TODO
+* Incorporate epubcheck
 * Add partial support
 * Remove html generation from the cli codebase
 * Maybe switch to tilt for templates

@@ -28,7 +28,7 @@ module Carta
         @MANUSCRIPT_DIR = "#{@PROJECT_DIR}/manuscript"
         @FIGURE_DIR     = "#{@MANUSCRIPT_DIR}/figures"
         @ASSET_DIR      = "#{@PROJECT_DIR}/assets"
-        @ASSET_FILES    = 'css,otf,ttf,jpeg,jpg,png,svg,gif'
+        @ASSET_FILES    = 'css,otf,woff,jpeg,jpg,png,svg,gif'
         @book = YAML.load_file("#{@MANUSCRIPT_DIR}/book.yaml")
       else
         thor.error 'No book found to compile!'
