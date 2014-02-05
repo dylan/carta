@@ -1,6 +1,7 @@
 require 'yaml'
 require 'thor/rake_compat'
 require 'mime-types'
+require 'rubygems'
 require 'zip'
 require 'carta/cli/html_renderer'
 require 'pry'
@@ -40,7 +41,8 @@ module Carta
 
     # Generates our HTML from markdown files and creates an outline
     def generate_html
-      html_renderer = Carta::CLI::HTMLRenderer.new(@MANUSCRIPT_DIR)
+      html_renderer = Carta::CLI::HTMLRenderer.new(@PROJECT_DIR)
+      # puts @MANUSCRIPT_DIR
       book['html']      = html_renderer.manuscript_html
       book['outline']   = html_renderer.outline
       book['toc_html']  = html_renderer.toc_html
@@ -67,6 +69,7 @@ module Carta
       files   = FileList.new("#{@LAYOUT_DIR}/epub/EPUB/*.erb")
                         .pathmap("%{^#{@LAYOUT_DIR}/epub/EPUB/,}X")
                         .exclude('**/*.opf*')
+                        .exclude('content.xhtml', 'nav.xhtml')
                         .exclude('**/*.ncx*')
                         .add("#{@FIGURE_DIR}/**/*.{#{@ASSET_FILES}}",
                              "#{@ASSET_DIR}/**/*.{#{@ASSET_FILES}}",
@@ -103,8 +106,23 @@ module Carta
     end
 
     def generate_epub
-      files = FileList.new("#{@BUILD_DIR}/**/*")
-      binding.pry
+      files = FileList.new("#{@BUILD_DIR}/epub/**/*")
+      zip_path = files.pathmap("%{^#{@BUILD_DIR}/epub/,}p")
+                      .exclude('EPUB', 'META-INF', 'mimetype')
+      files = files.exclude("#{@BUILD_DIR}/epub/EPUB", "#{@BUILD_DIR}/epub/META-INF")
+      zip = Zip::OutputStream.new("#{@BUILD_DIR}/#{book['title']}.epub")
+      zip.put_next_entry('mimetype', nil, nil, Zip::Entry::STORED, Zlib::NO_COMPRESSION)
+      zip.write "application/epub+zip"
+      zip_list = {}
+      zip_path.each_with_index do |value, i|
+        zip_list[value] = files[i]
+      end
+      zip_list.keys.each do |key|
+        # puts "#{key}: #{zip_list[key]}"
+        zip.put_next_entry key, nil, nil, Zip::Entry::DEFLATED, Zlib::BEST_COMPRESSION
+        zip.write IO.read(zip_list[key])
+      end
+      zip.close
 
     end
   end

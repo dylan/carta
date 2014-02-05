@@ -36,7 +36,7 @@ module Carta
       outline.each_with_index do |data, i|
         level, text, link, *children = data
         toc_html << "<ol #{final_class}>" if i == 0
-        toc_html << "\n  <li><a href='##{link}'>#{text}</a>"
+        toc_html << "\n  <li><a href='content.xhtml##{link}'>#{text}</a>"
 
         if children.empty?
           toc_html << '</li>'
@@ -44,7 +44,7 @@ module Carta
           children.each_with_index do |child, j|
             level, text, link = child
             toc_html << "\n    <ol>" if j == 0
-            toc_html << "\n      <li><a href='##{link}'>#{text}</a></li>"
+            toc_html << "\n      <li><a href='content.xhtml##{link}'>#{text}</a></li>"
             toc_html << "\n    </ol>\n  </li>" if j == children.length - 1
           end
         end

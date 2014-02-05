@@ -13,14 +13,14 @@
             <navLabel>
                 <text><%= i+1 -%>. <%= item[1] %></text>
             </navLabel>
-            <content src="content.html#<%= item[2] %>"/>
+            <content src="content.xhtml#<%= item[2] %>"/>
             <%- if item.length > 3
                 for j in (3..(item.length - 3)) -%>
             <navPoint id="#<%= item[j][2] %>">
                 <navLabel>
                     <text><%= "#{i+1}.#{j-2}" %> <%= item[j][1] %></text>
                 </navLabel>
-                <content src="content.html#<%= item[j][2] %>"/>
+                <content src="content.xhtml#<%= item[j][2] %>"/>
             </navPoint>
             <%- end -%>
             <%- end -%>

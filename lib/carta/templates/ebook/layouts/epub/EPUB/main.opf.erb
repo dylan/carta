@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">
+<package xmlns="http://www.idpf.org/2007/opf"
+         version="3.0"
+         unique-identifier="uid"
+         xml:lang="<%= book['language'] %>"
+         prefix="cc: http://creativecommons.org/ns#">
     <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
         <dc:identifier id="uid"><%= book['uid'] %></dc:identifier>
         <dc:title><%= book['title'] %></dc:title>
         <dc:creator><%= book['authors'] %></dc:creator>
         <dc:language><%= book['language'] %></dc:language>
         <dc:rights><%= book['license'] %></dc:rights>
+        <meta property="dcterms:modified"><%= DateTime.now.strftime('%Y-%m-%dT%TZ') %></meta>
         <!-- cover meta element included for 2.0 reading system compatibility: -->
         <meta name="cover" content="cover"/>
     </metadata>
     <manifest>
         <%- book['manifest'].each do |item| -%>
-        <item href="<%= item[:filename].gsub('EPUB/','') %>" media-type="<%= item[:media_type] %>" />
+        <item id="<%= File.basename(item[:filename],'.*') %>" href="<%= item[:filename].gsub('EPUB/','') %>" media-type="<%= item[:media_type] %>" />
         <%- end -%>
         <item id="cover" href="<%= book['cover'][:filename] %>" media-type="<%= book['cover'][:media_type] %>" properties="cover-image" />
-        <item id="toc" properties="nav" href="nav.html" media-type="application/html"/>
+        <item id="content" href="content.xhtml" media-type="application/xhtml+xml"/>
+        <item id="toc" properties="nav" href="nav.xhtml" media-type="application/xhtml+xml"/>
         <!-- ncx included for 2.0 reading system compatibility: -->
         <item id="ncx" href="main.ncx" media-type="application/x-dtbncx+xml" />
     </manifest>
     <spine toc='ncx'>
         <itemref linear='no' idref="toc" />
+        <itemref linear='yes' idref="content" />
     </spine>
 </package>

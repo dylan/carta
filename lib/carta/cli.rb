@@ -38,12 +38,13 @@ module Carta::CLI
       ask_title    = ask "Title:#{default_name}"
       ask_license  = ask 'License: (MIT)'
       ask_lang     = ask 'Language: (en-US)'
+      ask_author   = ask 'Author(s): (Anonymous)'
       ask_uuid     = ask 'uuid:'
 
       @meta = {
         title:    ask_title.empty? ? name : ask_title,
         subtitle: ask('Subtitle: (blank)'),
-        authors:  ask('Authors: (blank)'),
+        authors:  ask_author.empty? ? 'Anonymous' : ask_author,
         language: ask_lang.empty? ? 'en-US' : ask_lang,
         license:  ask_license.empty? ? 'MIT' : ask_license,
         uid:      ask_uuid.empty? ? UUID.new.generate : ask_uuid
