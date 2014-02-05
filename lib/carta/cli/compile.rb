@@ -1,7 +1,11 @@
 require 'yaml'
 require 'thor/rake_compat'
 require 'mime-types'
+require 'zip'
 require 'carta/cli/html_renderer'
+require 'pry'
+
+
 module Carta
   class CLI::Compile
     attr_reader :thor,
@@ -82,6 +86,7 @@ module Carta
       end
       copy_files
       render_layouts
+      generate_epub
     end
 
     def copy_files
@@ -95,6 +100,12 @@ module Carta
       assets.each_with_index do |file, index|
         thor.copy_file file, dest[index]
       end
+    end
+
+    def generate_epub
+      files = FileList.new("#{@BUILD_DIR}/**/*")
+      binding.pry
+
     end
   end
 end
