@@ -106,10 +106,8 @@ module Carta
     end
 
     def generate_epub
-      files = FileList.new("#{@BUILD_DIR}/epub/**/*")
+      files = FileList.new("#{@BUILD_DIR}/epub/**/*.*")
       zip_path = files.pathmap("%{^#{@BUILD_DIR}/epub/,}p")
-                      .exclude('EPUB', 'META-INF', 'mimetype')
-      files = files.exclude("#{@BUILD_DIR}/epub/EPUB", "#{@BUILD_DIR}/epub/META-INF")
       zip = Zip::OutputStream.new("#{@BUILD_DIR}/#{book['title']}.epub")
       zip.put_next_entry('mimetype', nil, nil, Zip::Entry::STORED, Zlib::NO_COMPRESSION)
       zip.write "application/epub+zip"
@@ -118,7 +116,6 @@ module Carta
         zip_list[value] = files[i]
       end
       zip_list.keys.each do |key|
-        # puts "#{key}: #{zip_list[key]}"
         zip.put_next_entry key, nil, nil, Zip::Entry::DEFLATED, Zlib::BEST_COMPRESSION
         zip.write IO.read(zip_list[key])
       end
