@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install carta
+    $ gem install carta --pre
 
 ## Usage
 
