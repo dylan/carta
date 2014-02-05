@@ -7,13 +7,25 @@ module Carta
   class CLI::Compile
     attr_reader :thor,
                 :book,
-                :project_dir
+                :PROJECT_DIR,
+                :LAYOUT_DIR,
+                :MANUSCRIPT_DIR,
+                :FIGURE_DIR,
+                :ASSET_DIR,
+                :BUILD_DIR,
+                :ASSET_FILES
 
     def initialize(thor)
       if Dir.exists?('manuscript')
-        @project_dir = Dir.pwd
         @thor = thor
-        @book = YAML.load_file("#{project_dir}/manuscript/book.yaml")
+        @PROJECT_DIR    = Dir.pwd
+        @BUILD_DIR      = "build"
+        @LAYOUT_DIR     = "#{@PROJECT_DIR}/layouts"
+        @MANUSCRIPT_DIR = "#{@PROJECT_DIR}/manuscript"
+        @FIGURE_DIR     = "#{@MANUSCRIPT_DIR}/figures"
+        @ASSET_DIR      = "#{@PROJECT_DIR}/assets"
+        @ASSET_FILES    = 'css,otf,ttf,jpeg,jpg,png,svg,gif'
+        @book = YAML.load_file("#{@MANUSCRIPT_DIR}/book.yaml")
       else
         thor.error 'No book found to compile!'
       end
@@ -25,7 +37,7 @@ module Carta
 
     # Generates our HTML from markdown files and creates an outline
     def generate_html
-      html_renderer = Carta::CLI::HTMLRenderer.new(project_dir)
+      html_renderer = Carta::CLI::HTMLRenderer.new(@MANUSCRIPT_DIR)
       book['html']      = html_renderer.manuscript_html
       book['outline']   = html_renderer.outline
       book['toc_html']  = html_renderer.toc_html
@@ -35,41 +47,34 @@ module Carta
 
     # Runs through our ERBs
     def render_layouts
-      layout_dir = "#{project_dir}/layouts"
-      build_dir  = "#{project_dir}/build"
-
-      FileList.new("#{layout_dir}/epub/**/*.erb").each do |layout|
-        filename = layout.pathmap("%{^#{layout_dir},#{build_dir}}X")
+      FileList.new("#{@LAYOUT_DIR}/epub/**/*.erb").each do |layout|
+        filename = layout.pathmap("%{^#{@LAYOUT_DIR},#{@BUILD_DIR}}X")
         path = filename.pathmap('%d')
 
         FileUtils.mkpath(path) unless File.exists? path
 
-        template = ERB.new(File.read(layout),nil,'-')
+        template = ERB.new(File.read(layout), nil, '-')
         File.open(filename, 'w+') do |handle|
           handle.write template.result(binding)
         end
       end
-
     end
 
     def generate_manifest
-      layout_dir = "#{project_dir}/layouts"
 
-      files   = FileList.new("#{layout_dir}/epub/EPUB/*.erb")
-                        .pathmap("%{^#{layout_dir}/epub/EPUB,}X")
-                        .add('manuscript/figures/**/*.{tif,jpeg,jpg,png,svg,mp4,gif}',
-                             'assets/fonts/**/*.{otf,ttf}',
-                             'assets/css/**/*.css',
-                             'assets/*.{tif,jpeg,jpg,png,svg,gif}',
-                             'manuscript/cover.{jpg,png,svg,gif')
-                        .pathmap('%{^assets,}p')
-                        .pathmap('%{^manuscript/figures,figures}p')
+      files   = FileList.new("#{@LAYOUT_DIR}/epub/EPUB/*.erb")
+                        .pathmap("%{^#{@LAYOUT_DIR}/epub/EPUB/,}X")
                         .exclude('**/*.opf*')
                         .exclude('**/*.ncx*')
+                        .add("#{@FIGURE_DIR}/**/*.{#{@ASSET_FILES}}",
+                             "#{@ASSET_DIR}/**/*.{#{@ASSET_FILES}}",
+                             "#{@MANUSCRIPT_DIR}/cover.{#{@ASSET_FILES}}")
+                       .pathmap("%{^#{@ASSET_DIR}/,}p")
+                       .pathmap("%{^#{@FIGURE_DIR},figures}p")
 
       book['manifest'] = []
+
       files.each do |file|
-        # filename = file.pathmap("%{^#{layout_dir},build}p")
         media_type = MIME::Types.type_for(file).first.content_type
         if file.include? 'cover'
           book['cover'] = { filename: file, media_type: media_type }
@@ -77,7 +82,21 @@ module Carta
           book['manifest'] << { filename: file, media_type: media_type }
         end
       end
+      copy_files
       render_layouts
+    end
+
+    def copy_files
+      assets = FileList.new("#{@FIGURE_DIR}/**/*.{#{@ASSET_FILES}}",
+                            "#{@ASSET_DIR}/**/*.{#{@ASSET_FILES}}",
+                            "#{@MANUSCRIPT_DIR}/cover.{#{@ASSET_FILES}}")
+
+      dest = assets.pathmap("%{^#{@ASSET_DIR},#{@BUILD_DIR}/epub/EPUB}p")
+                  .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/epub/EPUB/figures}p")
+
+      assets.each_with_index do |file, index|
+        thor.copy_file file, dest[index]
+      end
     end
   end
 end
