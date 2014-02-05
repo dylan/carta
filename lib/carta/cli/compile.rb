@@ -2,7 +2,6 @@ require 'yaml'
 require 'thor/rake_compat'
 require 'mime-types'
 require 'carta/cli/html_renderer'
-require 'pry'
 module Carta
   class CLI::Compile
     attr_reader :thor,
@@ -61,7 +60,6 @@ module Carta
     end
 
     def generate_manifest
-
       files   = FileList.new("#{@LAYOUT_DIR}/epub/EPUB/*.erb")
                         .pathmap("%{^#{@LAYOUT_DIR}/epub/EPUB/,}X")
                         .exclude('**/*.opf*')
@@ -92,7 +90,7 @@ module Carta
                             "#{@MANUSCRIPT_DIR}/cover.{#{@ASSET_FILES}}")
 
       dest = assets.pathmap("%{^#{@ASSET_DIR},#{@BUILD_DIR}/epub/EPUB}p")
-                  .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/epub/EPUB/figures}p")
+                   .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/epub/EPUB/figures}p")
 
       assets.each_with_index do |file, index|
         thor.copy_file file, dest[index]
