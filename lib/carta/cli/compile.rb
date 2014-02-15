@@ -28,7 +28,7 @@ module Carta
         @MANUSCRIPT_DIR = "#{@PROJECT_DIR}/manuscript"
         @FIGURE_DIR     = "#{@MANUSCRIPT_DIR}/figures"
         @ASSET_DIR      = "#{@PROJECT_DIR}/assets"
-        @ASSET_FILES    = 'css,otf,woff,jpeg,jpg,png,svg,gif'
+        @ASSET_FILES    = 'css,otf,woff,mov,m4v,mp4,mp3,jpeg,jpg,png,svg,gif'
         @book = YAML.load_file("#{@MANUSCRIPT_DIR}/book.yaml")
       else
         thor.error 'No book found to compile!'
@@ -36,9 +36,12 @@ module Carta
     end
 
     def run
+      clean
       generate_html if Dir.exists?('manuscript')
     end
-
+    def clean
+      thor.remove_dir "#{@PROJECT_DIR}/build"
+    end
     # Generates our HTML from markdown files and creates an outline
     def generate_html
       html_renderer = Carta::CLI::HTMLRenderer.new(@PROJECT_DIR)

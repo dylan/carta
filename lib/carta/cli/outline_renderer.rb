@@ -1,5 +1,5 @@
 # Custom Renderer for Redcarpet
-class OutlineRenderer < Redcarpet::Render::HTML
+class OutlineRenderer < Redcarpet::Render::XHTML
   attr_accessor :outline
 
   def initialize
