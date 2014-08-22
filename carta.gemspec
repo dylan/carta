@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['dylan@bvrgroup.us']
   spec.summary       = 'An ebook generator.'
   spec.description   = 'Generates a basic ebook project directory and renders it.'
-  spec.homepage      = ''
+  spec.homepage      = 'http://github.com/dylan/carta'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -19,9 +19,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler',    '~> 1.5'
-  spec.add_development_dependency 'rake'
-  spec.add_runtime_dependency     'uuid',       '>= 0'
-  spec.add_runtime_dependency     'rubyzip',    '~> 1.0.0'
+  spec.add_development_dependency 'rake',       '~> 0'
+  spec.add_runtime_dependency     'uuid',       '~> 0'
+  spec.add_runtime_dependency     'rubyzip',    '~> 1.0', '>= 1.0.0'
   spec.add_runtime_dependency     'mime-types', '~> 2.1'
   spec.add_runtime_dependency     'thor',       '= 0.18.1'
   spec.add_runtime_dependency     'redcarpet',  '= 3.0.0'
