@@ -4,7 +4,6 @@ require 'mime-types'
 require 'rubygems'
 require 'zip'
 require 'carta/cli/html_renderer'
-require 'pry'
 
 
 module Carta
