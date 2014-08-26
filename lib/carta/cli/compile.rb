@@ -16,6 +16,8 @@ module Carta
                 :FIGURE_DIR,
                 :ASSET_DIR,
                 :BUILD_DIR,
+                :EPUB_DIR,
+                :HTML_DIR,
                 :ASSET_FILES
 
     def initialize(thor)
@@ -27,6 +29,8 @@ module Carta
         @MANUSCRIPT_DIR = "#{@PROJECT_DIR}/manuscript"
         @FIGURE_DIR     = "#{@MANUSCRIPT_DIR}/figures"
         @ASSET_DIR      = "#{@PROJECT_DIR}/assets"
+        @EPUB_DIR       = "#{@PROJECT_DIR}/assets"
+        @HTML_DIR       = "#{@PROJECT_DIR}/assets"
         @ASSET_FILES    = 'css,otf,woff,mov,m4v,mp4,mp3,jpeg,jpg,png,svg,gif'
         @book = YAML.load_file("#{@MANUSCRIPT_DIR}/book.yaml")
       else
@@ -38,23 +42,38 @@ module Carta
       clean
       generate_html if Dir.exists?('manuscript')
     end
+
     def clean
       thor.remove_dir "#{@PROJECT_DIR}/build"
     end
+    
     # Generates our HTML from markdown files and creates an outline
     def generate_html
       html_renderer = Carta::CLI::HTMLRenderer.new(@PROJECT_DIR)
       # puts @MANUSCRIPT_DIR
       book['html']      = html_renderer.manuscript_html
       book['outline']   = html_renderer.outline
-      book['toc_html']  = html_renderer.toc_html
+      book['epub_toc_html']  = html_renderer.epub_toc_html
+      book['html_toc_html']  = html_renderer.html_toc_html
 
-      generate_manifest
+      generate_epub_manifest
     end
 
     # Runs through our ERBs
-    def render_layouts
+    def render_epub_layouts
       FileList.new("#{@LAYOUT_DIR}/epub/**/*.erb").each do |layout|
+        filename = layout.pathmap("%{^#{@LAYOUT_DIR},#{@BUILD_DIR}}X")
+        path = filename.pathmap('%d')
+
+        FileUtils.mkpath(path) unless File.exists? path
+
+        template = ERB.new(File.read(layout), nil, '-')
+        File.open(filename, 'w+') do |handle|
+          handle.write template.result(binding)
+        end
+      end
+
+      FileList.new("#{@LAYOUT_DIR}/html/**/*.erb").each do |layout|
         filename = layout.pathmap("%{^#{@LAYOUT_DIR},#{@BUILD_DIR}}X")
         path = filename.pathmap('%d')
 
@@ -67,7 +86,7 @@ module Carta
       end
     end
 
-    def generate_manifest
+    def generate_epub_manifest
       files   = FileList.new("#{@LAYOUT_DIR}/epub/EPUB/*.erb")
                         .pathmap("%{^#{@LAYOUT_DIR}/epub/EPUB/,}X")
                         .exclude('**/*.opf*')
@@ -90,7 +109,7 @@ module Carta
         end
       end
       copy_files
-      render_layouts
+      render_epub_layouts
       generate_epub
     end
 

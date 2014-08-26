@@ -4,12 +4,14 @@ module Carta
   class CLI::HTMLRenderer
     attr_accessor :markdown,
                   :manuscript_html,
-                  :toc_html,
+                  :epub_toc_html,
+                  :html_toc_html,
                   :outline
 
     def initialize(path)
       @markdown = ''
-      @toc_html = ''
+      @epub_toc_html = ''
+      @html_toc_html = ''
       @manuscript_html = ''
       @outline = nil
       load_markdown(path)
@@ -28,28 +30,41 @@ module Carta
       r = Redcarpet::Markdown.new(renderer)
       manuscript_html << r.render(markdown)
       @outline = renderer.outline
-      render_outline
+      @epub_toc_html = render_outline
+      @html_toc_html = render_outline('toc',true)
+
+
     end
 
-    def render_outline(html_class='toc')
+    def render_outline(html_class = 'toc', for_html = false)
       final_class = "class='#{html_class}'"
+      html = ''
       outline.each_with_index do |data, i|
         level, text, link, *children = data
-        toc_html << "<ol #{final_class}>" if i == 0
-        toc_html << "\n  <li><a href='content.xhtml##{link}'>#{text}</a>"
+        html << "<ol #{final_class}>" if i == 0
+        if for_html
+          html << "\n  <li><a href='##{link}'>#{text}</a>"
+        else
+          html << "\n  <li><a href='content.xhtml##{link}'>#{text}</a>"
+        end
 
         if children.empty?
-          toc_html << '</li>'
+          html << '</li>'
         else
           children.each_with_index do |child, j|
             level, text, link = child
-            toc_html << "\n    <ol>" if j == 0
-            toc_html << "\n      <li><a href='content.xhtml##{link}'>#{text}</a></li>"
-            toc_html << "\n    </ol>\n  </li>" if j == children.length - 1
+            html << "\n    <ol>" if j == 0
+            if for_html
+              html << "\n      <li><a href='##{link}'>#{text}</a></li>"
+            else
+              html << "\n      <li><a href='content.xhtml##{link}'>#{text}</a></li>"
+            end
+            html << "\n    </ol>\n  </li>" if j == children.length - 1
           end
         end
-        toc_html << "\n</ol>" if i == outline.length - 1
+        html << "\n</ol>" if i == outline.length - 1
       end
+      return html
     end
   end
 end

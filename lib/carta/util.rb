@@ -9,7 +9,7 @@ module Carta::Util
        .gsub(/[^0-9A-z.\-]/, '')
   end
 
-  # Pads at number so that it's 2 digits wide with leading
+  # Pads a number so that it's 2 digits wide with leading
   # zeros if needed.
   # 1 -> 01
   def self.pad(number)
