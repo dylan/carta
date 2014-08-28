@@ -32,8 +32,6 @@ module Carta
       @outline = renderer.outline
       @epub_toc_html = render_outline
       @html_toc_html = render_outline('toc',true)
-
-
     end
 
     def render_outline(html_class = 'toc', for_html = false)

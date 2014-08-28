@@ -95,8 +95,8 @@ module Carta
                         .add("#{@FIGURE_DIR}/**/*.{#{@ASSET_FILES}}",
                              "#{@ASSET_DIR}/**/*.{#{@ASSET_FILES}}",
                              "#{@MANUSCRIPT_DIR}/cover.{#{@ASSET_FILES}}")
-                       .pathmap("%{^#{@ASSET_DIR}/,}p")
-                       .pathmap("%{^#{@FIGURE_DIR},figures}p")
+                        .pathmap("%{^#{@ASSET_DIR}/,}p")
+                        .pathmap("%{^#{@FIGURE_DIR},figures}p")
 
       book['manifest'] = []
 
@@ -118,11 +118,15 @@ module Carta
                             "#{@ASSET_DIR}/**/*.{#{@ASSET_FILES}}",
                             "#{@MANUSCRIPT_DIR}/cover.{#{@ASSET_FILES}}")
 
-      dest = assets.pathmap("%{^#{@ASSET_DIR},#{@BUILD_DIR}/epub/EPUB}p")
-                   .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/epub/EPUB/figures}p")
+      epub_dest = assets.pathmap("%{^#{@ASSET_DIR},#{@BUILD_DIR}/epub/EPUB}p")
+                        .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/epub/EPUB/figures}p")
+      
+      html_dest = assets.pathmap("%{^#{@ASSET_DIR},#{@BUILD_DIR}/html}p")
+                        .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/html/figures}p")
 
       assets.each_with_index do |file, index|
-        thor.copy_file file, dest[index]
+        thor.copy_file file, epub_dest[index]
+        thor.copy_file file, html_dest[index]
       end
     end
 
