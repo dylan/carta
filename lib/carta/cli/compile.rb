@@ -46,7 +46,7 @@ module Carta
     def clean
       thor.remove_dir "#{@PROJECT_DIR}/build"
     end
-    
+
     # Generates our HTML from markdown files and creates an outline
     def generate_html
       html_renderer = Carta::CLI::HTMLRenderer.new(@PROJECT_DIR)
@@ -120,7 +120,7 @@ module Carta
 
       epub_dest = assets.pathmap("%{^#{@ASSET_DIR},#{@BUILD_DIR}/epub/EPUB}p")
                         .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/epub/EPUB/figures}p")
-      
+
       html_dest = assets.pathmap("%{^#{@ASSET_DIR},#{@BUILD_DIR}/html}p")
                         .pathmap("%{^#{@FIGURE_DIR},#{@BUILD_DIR}/html/figures}p")
 
